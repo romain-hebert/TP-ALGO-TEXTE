@@ -1,0 +1,7 @@
+BasedOnStyle: LLVM
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Empty
+AlignAfterOpenBracket: DontAlign
+SpaceAfterCStyleCast: true
+IndentWidth: 4
