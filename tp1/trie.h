@@ -1,4 +1,4 @@
-// #define _USE_HASH
+// #define _USE_HASH    // de-comment to use a hashtable
 
 #ifndef _USE_HASH
 
@@ -36,3 +36,5 @@ Trie createTrie(int maxNode);
 void insertInTrie(Trie trie, unsigned char *w);
 
 int isInTrie(Trie trie, unsigned char *w);
+
+void freeTrie(Trie trie);
