@@ -5,11 +5,11 @@ PRGS = main
 
 all: $(PRGS)
 
-main: main.o trie.o
-main.o: main.c trie.c
+main: main.c trie.c
+	$(CC) $(CFLAGS) $? -o $@
 
 clean:
-	$(RM) *.o *tar.gz *.log adresse.*
+	$(RM) *.o *tar.gz
 
 mdproper: clean
 	$(RM) $(PRGS)
