@@ -40,12 +40,17 @@ void insertInTrie(Trie trie, unsigned char *w) {
         exit(EXIT_FAILURE);
     }
     size_t n = 0;
-    while (w[n++] != '\0') {}
-    for (size_t i = 0; i <= n; ++i) {
-        trie->transition[w[i]][i] = trie->nextNode;
-        trie->nextNode++;
+    while (*w != '\0') {
+        printf("%c\n", *w);
+        if (trie->transition[*w][n] == 0) {
+            n = (size_t) trie->nextNode;
+            trie->transition[*w][n - 1] = trie->nextNode++;
+        } else {
+            n = (size_t) trie->transition[*w][n];
+        }
+        w += sizeof(w[0]);
     }
-    trie->finite[trie->nextNode - 1] = 1;
+    trie->finite[n] = 1;
 }
 
 int isInTrie(Trie trie, unsigned char *w) {
@@ -54,18 +59,16 @@ int isInTrie(Trie trie, unsigned char *w) {
         exit(EXIT_FAILURE);
     }
     size_t n = 0;
-    while (w[n++] != '\0') {}
-    int node;
-    for (size_t i = 0; i <= n; ++i) {
-        node = trie->transition[w[i]][i];
-        if (node == 0) {
+    while (*w != '\0') {
+        if (trie->transition[*w][n] == 0) {
             return -1;
         }
+        n = (size_t) trie->transition[*w][n];
+        w += sizeof(w[0]);
     }
-    if (trie->finite[node] == 0) {
+    if (trie->finite[n] == 0) {
         return -1;
     }
-
     return 0;
 }
 
