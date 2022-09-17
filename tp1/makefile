@@ -5,8 +5,8 @@ PRGS = main
 
 all: $(PRGS)
 
-main: main.c trie.c
-	$(CC) $(CFLAGS) $? -o $@
+main: main.o trie.o
+main.o: main.c trie.c
 
 clean:
 	$(RM) *.o *tar.gz
