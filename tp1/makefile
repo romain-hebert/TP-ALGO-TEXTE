@@ -9,7 +9,7 @@ main: main.o trie.o
 main.o: main.c trie.c
 
 clean:
-	$(RM) *.o *tar.gz
+	$(RM) *.o *.log *tar.gz
 
 mdproper: clean
 	$(RM) $(PRGS)

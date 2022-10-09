@@ -1,4 +1,4 @@
-// #define _USE_HASH    // de-comment to use a hashtable
+#define _USE_HASH // décommenter pour utiliser une table de hashage
 
 #ifndef _USE_HASH
 
