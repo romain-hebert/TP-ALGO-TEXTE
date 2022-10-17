@@ -1,44 +1,32 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #define MAX_ALPHA 78
 #define BUF_SIZE 4096
 
-void text_gen(size_t len, unsigned int alphabet_size, FILE *f);
+void text_gen(unsigned long len, unsigned int alphabet_size, FILE *f);
 
-int main(void) {
-    FILE *f = fopen("text2.txt", "w");
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        if (strcmp(argv[1], "--help") == 0) {
+            printf("Usage : [--help] FILE_NAME TEXT_LENGTH ALPHABET_SIZE\n");
+            exit(EXIT_SUCCESS);
+        }
+        fprintf(stderr, "Missing arguments. Try ./text_gen --help");
+    }
+    unsigned long text_len = strtoul(argv[2], NULL, 10);
+    unsigned int alpha_size = (unsigned int) strtol(argv[3], NULL, 10);
+
+    FILE *f = fopen(argv[1], "w");
     if (f == NULL) {
         perror("fopen()");
         exit(EXIT_FAILURE);
     }
-    text_gen(500000, 2, f);
-    fclose(f);
-
-    f = fopen("text4.txt", "w");
-    if (f == NULL) {
-        perror("fopen()");
-        exit(EXIT_FAILURE);
-    }
-    text_gen(500000, 4, f);
-    fclose(f);
-
-    f = fopen("text20.txt", "w");
-    if (f == NULL) {
-        perror("fopen()");
-        exit(EXIT_FAILURE);
-    }
-    text_gen(500000, 20, f);
-    fclose(f);
-
-    f = fopen("text70.txt", "w");
-    if (f == NULL) {
-        perror("fopen()");
-        exit(EXIT_FAILURE);
-    }
-    text_gen(500000, 70, f);
+    text_gen(text_len, alpha_size, f);
     fclose(f);
     return EXIT_SUCCESS;
 }
@@ -50,7 +38,7 @@ void text_gen(size_t len, unsigned int alphabet_size, FILE *f) {
         exit(EXIT_FAILURE);
     }
     char buf[BUF_SIZE] = {0};
-    srand((unsigned int) len + alphabet_size);
+    srand((unsigned int) (len + alphabet_size + (unsigned int) time(NULL)));
     size_t i = 0;
     size_t j = 0;
     while (i++ < len) {
