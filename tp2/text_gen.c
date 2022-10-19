@@ -13,7 +13,8 @@ void text_gen(unsigned long len, unsigned int alphabet_size, FILE *f);
 int main(int argc, char *argv[]) {
     if (argc != 4) {
         if (strcmp(argv[1], "--help") == 0) {
-            printf("Usage : [--help] FILE_NAME TEXT_LENGTH ALPHABET_SIZE\n");
+            printf("Usage : ./text_gen [--help] FILE_NAME TEXT_LENGTH "
+                   "ALPHABET_SIZE\n");
             exit(EXIT_SUCCESS);
         }
         fprintf(stderr, "Missing arguments. Try ./text_gen --help");
@@ -41,17 +42,18 @@ void text_gen(size_t len, unsigned int alphabet_size, FILE *f) {
     srand((unsigned int) (len + alphabet_size + (unsigned int) time(NULL)));
     size_t i = 0;
     size_t j = 0;
-    while (i++ < len) {
+    while (i < len) {
         buf[j++] = (char) (48 + ((unsigned int) rand() % alphabet_size));
         if (j >= BUF_SIZE - 1) {
-            if (fwrite(buf, sizeof(char), j, f) <= 0) {
+            if (fwrite(buf, sizeof(char), j, f) == 0) {
                 fprintf(stderr, "Echec d'ecriture. 1\n");
                 exit(EXIT_FAILURE);
             }
             j = 0;
         }
+        i++;
     }
-    if (fwrite(buf, sizeof(char), j, f) <= 0) {
+    if (fwrite(buf, sizeof(char), j, f) == 0 && ferror(f) != 0) {
         fprintf(stderr, "Echec d'ecriture. 1\n");
         exit(EXIT_FAILURE);
     }
