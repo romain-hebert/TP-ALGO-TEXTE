@@ -12,12 +12,9 @@ void text_gen(unsigned long len, unsigned int alphabet_size, FILE *f);
 
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        if (strcmp(argv[1], "--help") == 0) {
-            printf("Usage : ./text_gen [--help] FILE_NAME TEXT_LENGTH "
-                   "ALPHABET_SIZE\n");
-            exit(EXIT_SUCCESS);
-        }
-        fprintf(stderr, "Missing arguments. Try ./text_gen --help");
+        fprintf(stderr, "Usage : ./text_gen [--help] FILE_NAME TEXT_LENGTH "
+                        "ALPHABET_SIZE\n");
+        exit(EXIT_FAILURE);
     }
     unsigned long text_len = strtoul(argv[2], NULL, 10);
     unsigned int alpha_size = (unsigned int) strtol(argv[3], NULL, 10);

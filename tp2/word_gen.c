@@ -14,12 +14,9 @@ void word_gen(unsigned long word_nb, unsigned long word_size,
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        if (strcmp(argv[1], "--help") == 0) {
-            printf("Usage : ./word_gen [--help] FILE_NAME WORD_NB"
-                   "WORD_SIZE ALPHABET_SIZE\n");
-            exit(EXIT_SUCCESS);
-        }
-        fprintf(stderr, "Missing arguments. Try ./word_gen --help");
+        fprintf(stderr, "Usage : ./word_gen FILE_NAME WORD_NB "
+                        "WORD_SIZE ALPHABET_SIZE\n");
+        exit(EXIT_FAILURE);
     }
     unsigned long word_nb = strtoul(argv[2], NULL, 10);
     unsigned long word_size = strtoul(argv[3], NULL, 10);
