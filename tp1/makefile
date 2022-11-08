@@ -6,8 +6,7 @@ PRGS = main
 
 all: $(PRGS)
 
-main: main.o trie.o
-main.o: main.c trie.c
+main: main.c trie.c
 
 clean:
 	$(RM) *.o *.log *.tar.gz
