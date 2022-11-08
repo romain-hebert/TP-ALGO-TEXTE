@@ -124,52 +124,32 @@ void insertInTrie(Trie trie, unsigned char *w) {
     while (*w != '\0') {
         int h = hash(trie, n, *w);
         List *p = &trie->transition[h];
-        if (*p == NULL) {
-            // ce hash n'est pas encore dans la table.
+        while (*p != NULL && (*p)->startNode != n) {
+            p = &(*p)->next;
+        }
+        if ((*p) != NULL) {
+            // la transition est dans la table.
+            n = (*p)->targetNode;
+        } else {
+            // la transition n'est pas encore dans la table.
             if (trie->nextNode >= trie->maxNode) {
                 fprintf(stderr, "Limite de noeuds dépassée!\n");
                 return;
             }
-            *p = malloc(sizeof(**p));
-            if (*p == NULL) {
+
+            p = &trie->transition[h];
+            List q = malloc(sizeof(*q));
+            if (q == NULL) {
                 perror("malloc()");
                 exit(EXIT_FAILURE);
             }
-            (*p)->letter = *w;
-            (*p)->startNode = n;
-            (*p)->targetNode = trie->nextNode;
-            (*p)->next = NULL;
+            q->next = *p;
+            q->letter = *w;
+            q->startNode = n;
+            q->targetNode = trie->nextNode;
+            trie->transition[h] = q;
             n = trie->nextNode;
             trie->nextNode += 1;
-        } else {
-            // le hash existe dans la table.
-            while ((*p)->next != NULL && (*p)->startNode != n) {
-                p = &(*p)->next;
-            }
-            if ((*p)->startNode == n) {
-                // la transition est dans la table.
-                n = (*p)->targetNode;
-            } else {
-                // la transition n'est pas encore dans la table.
-                if (trie->nextNode >= trie->maxNode) {
-                    fprintf(stderr, "Limite de noeuds dépassée!\n");
-                    return;
-                }
-
-                p = &trie->transition[h];
-                List q = malloc(sizeof(*q));
-                if (q == NULL) {
-                    perror("malloc()");
-                    exit(EXIT_FAILURE);
-                }
-                q->next = *p;
-                q->letter = *w;
-                q->startNode = n;
-                q->targetNode = trie->nextNode;
-                trie->transition[h] = q;
-                n = trie->nextNode;
-                trie->nextNode += 1;
-            }
         }
         w += sizeof(*w);
     }
