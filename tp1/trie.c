@@ -123,13 +123,13 @@ void insertInTrie(Trie trie, unsigned char *w) {
     int n = 0;
     while (*w != '\0') {
         int h = hash(trie, n, *w);
-        List *p = &trie->transition[h];
-        while (*p != NULL && (*p)->startNode != n) {
-            p = &(*p)->next;
+        List p = trie->transition[h];
+        while (p != NULL && p->startNode != n) {
+            p = p->next;
         }
-        if ((*p) != NULL) {
+        if (p != NULL) {
             // la transition est dans la table.
-            n = (*p)->targetNode;
+            n = p->targetNode;
         } else {
             // la transition n'est pas encore dans la table.
             if (trie->nextNode >= trie->maxNode) {
@@ -137,13 +137,13 @@ void insertInTrie(Trie trie, unsigned char *w) {
                 return;
             }
 
-            p = &trie->transition[h];
+            p = trie->transition[h];
             List q = malloc(sizeof(*q));
             if (q == NULL) {
                 perror("malloc()");
                 exit(EXIT_FAILURE);
             }
-            q->next = *p;
+            q->next = p;
             q->letter = *w;
             q->startNode = n;
             q->targetNode = trie->nextNode;
