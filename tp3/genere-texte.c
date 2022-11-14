@@ -25,12 +25,11 @@ void text_gen(unsigned long len, int alphabet_size) {
         fprintf(stderr, "Alphabet trop grand!\n");
         exit(EXIT_FAILURE);
     }
+
     srand((unsigned int) len + (unsigned int) alphabet_size +
           (unsigned int) time(NULL));
-    size_t i = 0;
-    while (i < len) {
+    for (size_t i = 0; i < len; i++) {
         printf("%c", (char) (48 + (rand() % alphabet_size)));
-        i++;
     }
     printf("\n");
 }
