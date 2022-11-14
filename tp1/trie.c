@@ -86,7 +86,8 @@ void freeTrie(Trie trie) {
 #else
 // Avec table de hashage
 
-#define PRIME 23
+#define PRIME1 23
+#define PRIME2 21
 
 int hash(const Trie trie, int nodeNb, unsigned char c);
 
@@ -181,8 +182,8 @@ int isInTrie(Trie trie, unsigned char *w) {
 }
 
 int hash(const Trie trie, int nodeNb, unsigned char c) {
-    int hash = nodeNb;
-    hash += c;
+    int hash = nodeNb * PRIME1;
+    hash += c * PRIME2;
     return hash % (int) trie->maxNode;
 }
 

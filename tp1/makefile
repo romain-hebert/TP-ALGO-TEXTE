@@ -2,11 +2,15 @@ CC = gcc
 CFLAGS = -std=c11 -D_XOPEN_SOURCE=500 -Wall -Wconversion -Werror -Wextra -Wpedantic -Wwrite-strings -fstack-protector-all -O2 -pthread
 ARCHIVE_NAME = HebertRomain-TP
 TP = 1
-PRGS = main
+PRGS = test pref
 
 all: $(PRGS)
 
-main: main.c trie.c
+test: test.c trie.o
+
+pref: pref.c trie.o
+
+trie.o: trie.c
 
 clean:
 	$(RM) *.o *.log *.tar.gz

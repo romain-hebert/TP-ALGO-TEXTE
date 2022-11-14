@@ -24,7 +24,7 @@ int main(void) {
     insertInTrie(trie, w5);
     unsigned char w6[WORD_SIZE] = "Aurevoir";
     insertInTrie(trie, w6);
-    unsigned char w7[WORD_SIZE] = "Une phrase peut aussi etre un mot!"
+    unsigned char w7[WORD_SIZE] = "Une phrase peut aussi etre un mot! "
                                   "Meme si elle est tres longue.";
     insertInTrie(trie, w7);
 
