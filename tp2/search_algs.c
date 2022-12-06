@@ -66,9 +66,11 @@ int main(void) {
     unsigned long mp = morris_pratt(words[0], 12, text, TEXT_LEN);
     unsigned long kmp = knuth_mp(words[0], 12, text, TEXT_LEN);
     unsigned long nbb = naive_bi_br(words[0], 12, text, TEXT_LEN);
+    unsigned long nsb = naive_strncmp_br(words[0], 12, text, TEXT_LEN);
     unsigned long nbbs = naive_bi_br_sent(words[0], 12, text, TEXT_LEN);
 
-    printf("nbb\t%zu\nnbbs\t%zu\nmp\t%zu\nkmp\t%zu\n", nbb, nbbs, mp, kmp);
+    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nmp,%zu\nkmp,%zu\n", nbb, nbbs, nsb, mp,
+        kmp);
     return EXIT_SUCCESS;
 }
 
@@ -94,7 +96,7 @@ void add_sent(const char *x, size_t m, char *y, size_t n) {
     }
 }
 
-void remove_sent(char *y, size_t n) { y[n] = '\0'; }
+void remove_sent(char *text, size_t text_len) { text[text_len + 1] = '\0'; }
 
 unsigned long naive_bi_br_sent(const char *x, size_t m, char *y, size_t n) {
     unsigned long occ = 0;
@@ -121,9 +123,16 @@ unsigned long naive_bi_br_sent(const char *x, size_t m, char *y, size_t n) {
 // long n)
 // {}
 
-// unsigned long naive_strncmp_br(const char *x, unsigned long m, char *y,
-// unsigned long n) {
-// }
+unsigned long naive_strncmp_br(
+    const char *x, unsigned long m, char *y, unsigned long n) {
+    unsigned long occ = 0;
+    for (size_t j = 0; j <= n - m; j++) {
+        if (strncmp(y + j, x, m) == 0) {
+            occ += 1;
+        }
+    }
+    return occ;
+}
 
 // unsigned long naive_strncmp_br_sent(
 //     const char *x, unsigned long m, char *y, unsigned long n) {}
