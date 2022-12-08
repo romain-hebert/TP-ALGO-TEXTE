@@ -1,3 +1,4 @@
+#include "constants.h"
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
@@ -5,9 +6,6 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
-#define MAX_ALPHA 78
-#define BUF_SIZE 4096
 
 void word_gen(unsigned long word_nb, unsigned long word_size,
     unsigned int alphabet_size, FILE *f);
@@ -46,7 +44,8 @@ void word_gen(unsigned long word_nb, unsigned long word_size,
     size_t j = 0;
     while (i < word_nb) {
         for (size_t k = 0; k < word_size; k++) {
-            buf[j++] = (char) (48 + ((unsigned int) rand() % alphabet_size));
+            buf[j++] =
+                (char) (ALPHA_START + ((unsigned int) rand() % alphabet_size));
             if (j >= BUF_SIZE - 1) {
                 if (fwrite(buf, sizeof(char), j, f) == 0) {
                     fprintf(stderr, "Echec d'ecriture. 1\n");

@@ -1,12 +1,10 @@
+#include "constants.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
-#define MAX_ALPHA 78
-#define BUF_SIZE 4096
 
 void text_gen(unsigned long len, unsigned int alphabet_size, FILE *f);
 
