@@ -10,7 +10,7 @@ void text_gen(unsigned long len, unsigned int alphabet_size, FILE *f);
 
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        fprintf(stderr, "Usage : ./text_gen [--help] FILE_NAME TEXT_LENGTH "
+        fprintf(stderr, "Usage : ./text_gen FILE_NAME TEXT_LENGTH "
                         "ALPHABET_SIZE\n");
         exit(EXIT_FAILURE);
     }

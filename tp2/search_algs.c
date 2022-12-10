@@ -31,8 +31,11 @@ unsigned long morris_pratt(const char *x, size_t m, const char *y, size_t n);
 
 unsigned long knuth_mp(const char *x, size_t m, const char *y, size_t n);
 
+unsigned long boyer_moore(
+    const char *x, int m, const char *y, size_t n, int alpha);
+
 int main(void) {
-    FILE *y = fopen("texts/text2.txt", "rw");
+    FILE *y = fopen("texts/text2.txt", "r");
     if (y == NULL) {
         perror("fopen()");
         exit(EXIT_FAILURE);
@@ -42,16 +45,17 @@ int main(void) {
         perror("fopen()");
         exit(EXIT_FAILURE);
     }
+    size_t word_len = 12;
 
     char *words[WORD_COUNT + 1];
     char buf[BUF_SIZE] = {'\0'};
-    size_t i = 0;
 
     // Remplir le tableau words avec les mots du fichier x
     if (fread(buf, sizeof(char), BUF_SIZE, x) <= 0) {
         perror("fread on x");
         exit(EXIT_FAILURE);
     }
+    size_t i = 0;
     words[i++] = strtok(buf, " ");
     while (i < WORD_COUNT) {
         words[i++] = strtok(NULL, " ");
@@ -67,16 +71,18 @@ int main(void) {
     fclose(y);
 
     printf("Search of %s\n", words[0]);
-    unsigned long mp = morris_pratt(words[0], 12, text, TEXT_LEN);
-    unsigned long kmp = knuth_mp(words[0], 12, text, TEXT_LEN);
-    unsigned long nbb = naive_bi_br(words[0], 12, text, TEXT_LEN);
-    unsigned long nsb = naive_strncmp_br(words[0], 12, text, TEXT_LEN);
-    unsigned long nbbs = naive_bi_br_sent(words[0], 12, text, TEXT_LEN);
-    unsigned long nsbs = naive_strncmp_br_sent(words[0], 12, text, TEXT_LEN);
+    unsigned long mp = morris_pratt(words[0], word_len, text, TEXT_LEN);
+    unsigned long kmp = knuth_mp(words[0], word_len, text, TEXT_LEN);
+    unsigned long nbb = naive_bi_br(words[0], word_len, text, TEXT_LEN);
+    unsigned long nsb = naive_strncmp_br(words[0], word_len, text, TEXT_LEN);
+    unsigned long nbbs = naive_bi_br_sent(words[0], word_len, text, TEXT_LEN);
+    unsigned long nsbs =
+        naive_strncmp_br_sent(words[0], word_len, text, TEXT_LEN);
+    unsigned long bm = boyer_moore(words[0], (int) word_len, text, TEXT_LEN, 2);
 
     // print au format cvs
-    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nnsbs,%zu\nmp,%zu\nkmp,%zu\n", nbb, nbbs,
-        nsb, nsbs, mp, kmp);
+    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nnsbs,%zu\nmp,%zu\nkmp,%zu\nbm,%zu\n",
+        nbb, nbbs, nsb, nsbs, mp, kmp, bm);
     return EXIT_SUCCESS;
 }
 
@@ -230,48 +236,85 @@ unsigned long knuth_mp(const char *x, size_t m, const char *y, size_t n) {
     return occ;
 }
 
-void create_dern_occ(const char *x, int m, int alpha, int *dern_occ) {
+void dern_occ(const char *x, int m, int alpha, int *dernocc) {
     for (int i = 0; i < alpha; i++) {
-        dern_occ[i] = m;
+        dernocc[i] = m;
     }
-    for (int i = 0; i < m - 2; i++) {
-        dern_occ[x[i] - ALPHA_START] = m - 1 - i;
+    for (int i = 0; i < m - 1; i++) {
+        dernocc[x[i] - ALPHA_START] = m - i - 1;
     }
 }
 
-void create_suff(const char *x, int m, int *suff) {
+void suff(const char *x, int m, int *s) {
+    for (int i = 0; i < m; i++) {
+        s[i] = 0;
+    }
+
     int f = 0;
 
-    suff[m - 1] = m;
+    s[m - 1] = m;
     int g = m - 1;
     for (int i = m - 2; i >= 0; --i) {
-        if (i > g && suff[i + m - 1 - f] < i - g)
-            suff[i] = suff[i + m - 1 - f];
-        else {
-            if (i < g)
+        if (i > g && s[i + m - 1 - f] < i - g) {
+            s[i] = s[i + m - 1 - f];
+        } else {
+            if (i < g) {
                 g = i;
+            }
             f = i;
-            while (g >= 0 && x[g] == x[g + m - 1 - f])
+            while (g >= 0 && x[g] == x[g + m - 1 - f]) {
                 g -= 1;
-            suff[i] = f - g;
+            }
+            s[i] = f - g;
         }
     }
 }
 
-void create_bon_suff(const char *x, int m, int *bon_suff) {
-    int suff[m];
+void bon_suff(const char *x, int m, int *bonsuff) {
     for (int i = 0; i < m; i++) {
-        suff[i] = 0;
+        bonsuff[i] = 0;
     }
-    create_suff(x, m, suff);
+    int s[m];
+    suff(x, m, s);
 
-    for (int i = 0; i < m; ++i)
-        bon_suff[i] = m;
-    for (int i = m - 1; i >= 0; --i)
-        if (suff[i] == i + 1)
-            for (int j = 0; j < m - 1 - i; ++j)
-                if (bon_suff[j] == m)
-                    bon_suff[j] = m - 1 - i;
-    for (int i = 0; i <= m - 2; ++i)
-        bon_suff[m - 1 - suff[i]] = m - 1 - i;
+    for (int i = 0; i < m; ++i) {
+        bonsuff[i] = m;
+    }
+    for (int i = m - 1; i >= 0; --i) {
+        if (s[i] == i + 1) {
+            for (int j = 0; j < m - 1 - i; ++j) {
+                if (bonsuff[j] == m) {
+                    bonsuff[j] = m - 1 - i;
+                }
+            }
+        }
+    }
+    for (int i = 0; i <= m - 2; ++i) {
+        bonsuff[m - 1 - s[i]] = m - 1 - i;
+    }
+}
+
+unsigned long boyer_moore(
+    const char *x, int m, const char *y, size_t n, int alpha) {
+    unsigned long occ = 0;
+
+    int dernocc[alpha];
+    dern_occ(x, m, alpha, dernocc);
+
+    int bonsuff[m];
+    bon_suff(x, m, bonsuff);
+
+    int i;
+    int j = 0;
+    while (j <= (int) n - m) {
+        for (i = m - 1; i >= 0 && x[i] == y[i + j]; --i) {}
+        if (i < 0) {
+            occ++;
+            j += bonsuff[0];
+        } else {
+            int d = dernocc[y[j + i] - ALPHA_START] - m + 1 + i;
+            j += (bonsuff[i] > d ? bonsuff[i] : d);
+        }
+    }
+    return occ;
 }

@@ -12,10 +12,11 @@ word_gen: word_gen.c
 
 search_algs: search_algs.c
 
+clean_texts:
+	$(RM) -r texts/
+	$(RM) -r words/
 clean:
-	$(RM) text*.txt *.o *.log *.tar.gz
-	$(RM) words/*
-	$(RM) texts/*
+	$(RM) *.o *.log *.tar.gz
 
 mdproper: clean
 	$(RM) $(PRGS)
