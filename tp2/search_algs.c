@@ -7,34 +7,36 @@
 #define WORD_COUNT 100
 #define TEXT_LEN 500000
 
-void bon_pref(const char *x, size_t m, int *bon_pref);
+void bon_pref(const char *x, int m, int *bon_pref);
 
-void meil_pref(const char *x, size_t m, int *meil_pref);
+void meil_pref(const char *x, int m, int *meil_pref);
 
 void dern_occ(const char *x, int m, int alpha, int *dernocc);
 
 // Return nb of occurence of x, a word of size m, in y, a text of size n
-unsigned long naive_bi(const char *x, size_t m, const char *y, size_t n);
+unsigned long naive_bi(const char *x, int m, const char *y, int n);
 
-unsigned long naive_bi_br(const char *x, size_t m, const char *y, size_t n);
+unsigned long naive_bi_br(const char *x, int m, const char *y, int n);
 
-unsigned long naive_bi_br_sent(const char *x, size_t m, char *y, size_t n);
+unsigned long naive_bi_br_sent(const char *x, int m, char *y, int n);
 
-unsigned long naive_strncmp(const char *x, size_t m, const char *y, size_t n);
+unsigned long naive_strncmp(const char *x, int m, const char *y, int n);
 
-unsigned long naive_strncmp_br(const char *x, size_t m, const char *y,
-        size_t n);
+unsigned long naive_strncmp_br(const char *x, int m, const char *y, int n);
 
-unsigned long naive_strncmp_br_sent(const char *x, size_t m, char *y, size_t n);
+unsigned long naive_strncmp_br_sent(const char *x, int m, char *y, int n);
 
-unsigned long morris_pratt(const char *x, size_t m, const char *y, size_t n);
+unsigned long morris_pratt(const char *x, int m, const char *y, int n);
 
-unsigned long knuth_mp(const char *x, size_t m, const char *y, size_t n);
+unsigned long knuth_mp(const char *x, int m, const char *y, int n);
 
-unsigned long boyer_moore(const char *x, int m, const char *y, size_t n,
+unsigned long boyer_moore(const char *x, int m, const char *y, int n,
         int alpha);
 
+unsigned long horspool(char const *x, int m, const char *y, int n, int alpha);
+
 int main(void) {
+    // Cette fonction sert à tester les différents algorithmes
     FILE *y = fopen("texts/text2.txt", "r");
     if (y == NULL) {
         perror("fopen()");
@@ -45,17 +47,17 @@ int main(void) {
         perror("fopen()");
         exit(EXIT_FAILURE);
     }
-    size_t word_len = 12;
-
-    char *words[WORD_COUNT + 1];
-    char buf[BUF_SIZE] = {'\0'};
+    int word_len = 12;
 
     // Remplir le tableau words avec les mots du fichier x
+    char buf[BUF_SIZE] = {'\0'};
     if (fread(buf, sizeof(char), BUF_SIZE, x) <= 0) {
         perror("fread on x");
         exit(EXIT_FAILURE);
     }
-    size_t i = 0;
+
+    char *words[WORD_COUNT + 1];
+    int i = 0;
     words[i++] = strtok(buf, " ");
     while (i < WORD_COUNT) {
         words[i++] = strtok(NULL, " ");
@@ -63,7 +65,7 @@ int main(void) {
     fclose(x);
 
     // Mettre le texte dans un char*
-    char text[TEXT_LEN * 2] = {'\0'};
+    char text[TEXT_LEN + word_len + 1];
     if (fread(text, sizeof(char), TEXT_LEN, y) <= 0) {
         perror("fread on y");
         exit(EXIT_FAILURE);
@@ -78,11 +80,13 @@ int main(void) {
     unsigned long nbbs = naive_bi_br_sent(words[0], word_len, text, TEXT_LEN);
     unsigned long nsbs =
             naive_strncmp_br_sent(words[0], word_len, text, TEXT_LEN);
-    unsigned long bm = boyer_moore(words[0], (int) word_len, text, TEXT_LEN, 2);
+    unsigned long bm = boyer_moore(words[0], word_len, text, TEXT_LEN, 2);
+    unsigned long hp = horspool(words[0], word_len, text, TEXT_LEN, 2);
 
     // print au format cvs
-    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nnsbs,%zu\nmp,%zu\nkmp,%zu\nbm,%zu\n",
-            nbb, nbbs, nsb, nsbs, mp, kmp, bm);
+    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nnsbs,%zu\nmp,%zu\nkmp,%zu\nbm,%"
+           "zu\nhp,%zu\n",
+            nbb, nbbs, nsb, nsbs, mp, kmp, bm, hp);
     return EXIT_SUCCESS;
 }
 
@@ -90,10 +94,10 @@ int main(void) {
 // unsigned long naive_bi(const char *x, unsigned long m, char *y, unsigned long
 // n) {}
 
-unsigned long naive_bi_br(const char *x, size_t m, const char *y, size_t n) {
+unsigned long naive_bi_br(const char *x, int m, const char *y, int n) {
     unsigned long occ = 0;
-    size_t i;
-    for (size_t j = 0; j <= n - m; j++) {
+    int i;
+    for (int j = 0; j <= n - m; j++) {
         for (i = 0; i < m && x[i] == y[i + j]; i++) {}
         if (i >= m)
             occ++;
@@ -101,20 +105,20 @@ unsigned long naive_bi_br(const char *x, size_t m, const char *y, size_t n) {
     return occ;
 }
 
-void add_sent(const char *x, size_t m, char *y, size_t n) {
-    for (size_t i = 0; i < m; i++)
+void add_sent(const char *x, int m, char *y, int n) {
+    for (int i = 0; i < m; i++)
         y[n + i] = x[i];
 }
 
-void remove_sent(char *text, size_t text_len) {
+void remove_sent(char *text, int text_len) {
     text[text_len + 1] = '\0';
 }
 
-unsigned long naive_bi_br_sent(const char *x, size_t m, char *y, size_t n) {
+unsigned long naive_bi_br_sent(const char *x, int m, char *y, int n) {
     unsigned long occ = 0;
     add_sent(x, m, y, n);
 
-    size_t i, j = 0;
+    int i, j = 0;
     while (1) {
         for (i = 0; i < m && x[i] == y[i + j]; ++i) {}
         if (i >= m) {
@@ -130,26 +134,22 @@ unsigned long naive_bi_br_sent(const char *x, size_t m, char *y, size_t n) {
     exit(EXIT_FAILURE);
 }
 
-// unsigned long naive_strncmp(const char *x, unsigned long m, char *y, unsigned
-// long n)
-// {}
+// unsigned long naive_strncmp(const char *x, int m, char *y, int n) {}
 
-unsigned long naive_strncmp_br(const char *x, size_t m, const char *y,
-        size_t n) {
+unsigned long naive_strncmp_br(const char *x, int m, const char *y, int n) {
     unsigned long occ = 0;
-    for (size_t j = 0; j <= n - m; j++)
-        if (strncmp(y + j, x, m) == 0)
+    for (int j = 0; j <= n - m; j++)
+        if (strncmp(y + j, x, (size_t) m) == 0)
             occ += 1;
     return occ;
 }
 
-unsigned long naive_strncmp_br_sent(const char *x, size_t m, char *y,
-        size_t n) {
+unsigned long naive_strncmp_br_sent(const char *x, int m, char *y, int n) {
     unsigned long occ = 0;
     add_sent(x, m, y, n);
-    size_t j = 0;
+    int j = 0;
     while (1) {
-        if (strncmp(y + j, x, m) == 0) {
+        if (strncmp(y + j, x, (size_t) m) == 0) {
             if (j == n) {
                 remove_sent(y, n);
                 return occ;
@@ -160,10 +160,10 @@ unsigned long naive_strncmp_br_sent(const char *x, size_t m, char *y,
     }
 }
 
-void bon_pref(const char *x, size_t m, int *bp) {
+void bon_pref(const char *x, int m, int *bp) {
     bp[0] = -1;
     int i = 0;
-    for (size_t j = 1; j < (size_t) m; j++) {
+    for (int j = 1; j < m; j++) {
         bp[j] = i;
         while (i >= 0 && x[i] != x[j])
             i = bp[i];
@@ -172,10 +172,10 @@ void bon_pref(const char *x, size_t m, int *bp) {
     bp[m] = i;
 }
 
-void meil_pref(const char *x, size_t m, int *mp) {
+void meil_pref(const char *x, int m, int *mp) {
     mp[0] = -1;
     int i = 0;
-    for (size_t j = 1; j < (size_t) m; j++) {
+    for (int j = 1; j < m; j++) {
         if (x[i] == x[j])
             mp[j] = mp[i];
         else {
@@ -189,19 +189,19 @@ void meil_pref(const char *x, size_t m, int *mp) {
     mp[m] = i;
 }
 
-unsigned long morris_pratt(const char *x, size_t m, const char *y, size_t n) {
+unsigned long morris_pratt(const char *x, int m, const char *y, int n) {
     int bp[m];
-    for (size_t i = 0; i < (size_t) m; i++)
+    for (int i = 0; i < m; i++)
         bp[i] = 0;
     bon_pref(x, m, bp);
 
     unsigned long occ = 0;
-    long i = 0;
-    for (long j = 0; j < (long) (n - m); j++) {
+    int i = 0;
+    for (int j = 0; j < n - m; j++) {
         while (i >= 0 && x[i] != y[j])
             i = bp[i];
         i += 1;
-        if (i == (long) m) {
+        if (i == m) {
             occ += 1;
             i = bp[i];
         }
@@ -209,19 +209,19 @@ unsigned long morris_pratt(const char *x, size_t m, const char *y, size_t n) {
     return occ;
 }
 
-unsigned long knuth_mp(const char *x, size_t m, const char *y, size_t n) {
+unsigned long knuth_mp(const char *x, int m, const char *y, int n) {
     int mp[m];
-    for (size_t i = 0; i < (size_t) m; i++)
+    for (int i = 0; i < m; i++)
         mp[i] = 0;
     meil_pref(x, m, mp);
 
     unsigned long occ = 0;
-    long i = 0;
-    for (long j = 0; j < (long) (n - m); j++) {
+    int i = 0;
+    for (int j = 0; j < n - m; j++) {
         while (i >= 0 && x[i] != y[j])
             i = mp[i];
         i += 1;
-        if (i == (long) m) {
+        if (i == m) {
             occ += 1;
             i = mp[i];
         }
@@ -248,9 +248,8 @@ void suff(const char *x, int m, int *s) {
         if (i > g && s[i + m - 1 - f] < i - g)
             s[i] = s[i + m - 1 - f];
         else {
-            if (i < g) {
+            if (i < g)
                 g = i;
-            }
             f = i;
             while (g >= 0 && x[g] == x[g + m - 1 - f])
                 g -= 1;
@@ -260,8 +259,6 @@ void suff(const char *x, int m, int *s) {
 }
 
 void bon_suff(const char *x, int m, int *bonsuff) {
-    for (int i = 0; i < m; i++)
-        bonsuff[i] = 0;
     int s[m];
     suff(x, m, s);
 
@@ -277,7 +274,7 @@ void bon_suff(const char *x, int m, int *bonsuff) {
         bonsuff[m - 1 - s[i]] = m - 1 - i;
 }
 
-unsigned long boyer_moore(const char *x, int m, const char *y, size_t n,
+unsigned long boyer_moore(const char *x, int m, const char *y, int n,
         int alpha) {
     unsigned long occ = 0;
 
@@ -289,7 +286,7 @@ unsigned long boyer_moore(const char *x, int m, const char *y, size_t n,
 
     int i;
     int j = 0;
-    while (j <= (int) n - m) {
+    while (j <= n - m) {
         for (i = m - 1; i >= 0 && x[i] == y[i + j]; --i) {}
         if (i < 0) {
             occ++;
@@ -298,6 +295,22 @@ unsigned long boyer_moore(const char *x, int m, const char *y, size_t n,
             int d = dernocc[y[j + i] - ALPHA_START] - m + 1 + i;
             j += (bonsuff[i] > d ? bonsuff[i] : d);
         }
+    }
+    return occ;
+}
+
+unsigned long horspool(char const *x, int m, const char *y, int n, int alpha) {
+    unsigned int occ = 0;
+
+    int dernocc[alpha];
+    dern_occ(x, m, alpha, dernocc);
+
+    int j = 0;
+    while (j <= n - m) {
+        char yj = y[j + m - 1];
+        if (x[m - 1] == yj && strncmp(x, y + j, (size_t) m - 1) == 0)
+            occ += 1;
+        j += dernocc[yj - ALPHA_START];
     }
     return occ;
 }
