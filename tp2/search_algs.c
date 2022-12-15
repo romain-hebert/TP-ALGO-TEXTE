@@ -75,7 +75,9 @@ int main(void) {
     printf("Search of %s\n", words[0]);
     unsigned long mp = morris_pratt(words[0], word_len, text, TEXT_LEN);
     unsigned long kmp = knuth_mp(words[0], word_len, text, TEXT_LEN);
+    // unsigned long nb = naive_bi(words[0], word_len, text, TEXT_LEN);
     unsigned long nbb = naive_bi_br(words[0], word_len, text, TEXT_LEN);
+    // unsigned long ns = naive_strncmp(words[0], word_len, text, TEXT_LEN);
     unsigned long nsb = naive_strncmp_br(words[0], word_len, text, TEXT_LEN);
     unsigned long nbbs = naive_bi_br_sent(words[0], word_len, text, TEXT_LEN);
     unsigned long nsbs =

@@ -7,8 +7,7 @@
 #include <time.h>
 #include <unistd.h>
 
-void word_gen(unsigned long word_nb, unsigned long word_size,
-    unsigned int alphabet_size, FILE *f);
+void word_gen(int word_nb, int word_size, int alphabet_size, FILE *f);
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
@@ -16,9 +15,9 @@ int main(int argc, char *argv[]) {
                         "WORD_SIZE ALPHABET_SIZE\n");
         exit(EXIT_FAILURE);
     }
-    unsigned long word_nb = strtoul(argv[2], NULL, 10);
-    unsigned long word_size = strtoul(argv[3], NULL, 10);
-    unsigned int alpha_size = (unsigned int) strtol(argv[4], NULL, 10);
+    int word_nb = atoi(argv[2]);
+    int word_size = atoi(argv[3]);
+    int alpha_size = atoi(argv[4]);
 
     FILE *f = fopen(argv[1], "w");
     if (f == NULL) {
@@ -30,8 +29,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-void word_gen(unsigned long word_nb, unsigned long word_size,
-    unsigned int alphabet_size, FILE *f) {
+void word_gen(int word_nb, int word_size, int alphabet_size, FILE *f) {
     if (alphabet_size >= MAX_ALPHA) {
         // On tombe à court de caractères ASCII lisibles.
         fprintf(stderr, "Alphabet trop grand!\n");
@@ -39,15 +37,14 @@ void word_gen(unsigned long word_nb, unsigned long word_size,
     }
     char buf[BUF_SIZE] = {0};
     srand((unsigned int) (word_nb + word_size + alphabet_size +
-                          (unsigned int) time(NULL) % UINT_MAX));
-    size_t i = 0;
-    size_t j = 0;
+                          time(NULL) % UINT_MAX));
+    int i = 0;
+    int j = 0;
     while (i < word_nb) {
-        for (size_t k = 0; k < word_size; k++) {
-            buf[j++] =
-                (char) (ALPHA_START + ((unsigned int) rand() % alphabet_size));
+        for (int k = 0; k < word_size; k++) {
+            buf[j++] = (char) (ALPHA_START + rand() % alphabet_size);
             if (j >= BUF_SIZE - 1) {
-                if (fwrite(buf, sizeof(char), j, f) == 0) {
+                if (fwrite(buf, sizeof(char), (size_t) j, f) == 0) {
                     fprintf(stderr, "Echec d'ecriture. 1\n");
                     exit(EXIT_FAILURE);
                 }
@@ -58,7 +55,7 @@ void word_gen(unsigned long word_nb, unsigned long word_size,
         if (i != word_nb) {
             buf[j++] = ' ';
             if (j >= BUF_SIZE - 1) {
-                if (fwrite(buf, sizeof(char), j, f) == 0) {
+                if (fwrite(buf, sizeof(char), (size_t) j, f) == 0) {
                     fprintf(stderr, "Echec d'ecriture. 1\n");
                     exit(EXIT_FAILURE);
                 }
@@ -66,7 +63,7 @@ void word_gen(unsigned long word_nb, unsigned long word_size,
             }
         }
     }
-    if (fwrite(buf, sizeof(char), j, f) == 0 && ferror(f) != 0) {
+    if (fwrite(buf, sizeof(char), (size_t) j, f) == 0 && ferror(f) != 0) {
         fprintf(stderr, "Echec d'ecriture. 1\n");
         exit(EXIT_FAILURE);
     }
