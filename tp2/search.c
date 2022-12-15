@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
                         "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"
                         "7. Boyer-Moore\n8. Horspool\n"
                         "-p: Displays results on output, might make the"
-                        "program slower.");
+                        "program slower.\n");
         exit(EXIT_FAILURE);
     }
     int arg = 1;
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     int i = 0;
     words[i++] = strtok(buf, " ");
     while (i < WORD_COUNT) {
-        words[i++] = strtok(NULL, " ");
+        words[i++] = strtok(NULL, " \0");
     }
     fclose(x);
     int word_len = (int) strlen(words[0]);
@@ -118,7 +118,9 @@ int main(int argc, char *argv[]) {
                         " sentinel\n3. Naive quick loop with strncmp\n"
                         "4. Naive quick loop with strncmp and sentinel\n"
                         "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"
-                        "7. Boyer-Moore\n8. Horspool\n");
+                        "7. Boyer-Moore\n8. Horspool\n"
+                        "-p: Displays results on output, might make the"
+                        "program slower.\n");
         break;
     }
     fclose(out);

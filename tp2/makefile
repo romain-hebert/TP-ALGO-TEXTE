@@ -16,8 +16,8 @@ search_algs.o: search_algs.c
 test_search_algs: test_search_algs.c search_algs.o
 
 clean_texts:
-	$(RM) -r texts/
-	$(RM) -r words/
+	$(RM) texts/*
+	$(RM) words/*
 clean:
 	$(RM) *.o *.log *.tar.gz
 

@@ -4,7 +4,11 @@ alpha=(2 4 20 70)
 echo "Generating..."
 for i in ${alpha[@]}; do
     for j in ${word_len[@]}; do
-        ./word_gen "words/words-$i-$j.txt" 100 $i $j
+        ./word_gen "words/words-$i-$j.txt" 100 $j $i
     done
 done
 echo "Done"
+
+for i in ${alpha[@]}; do
+    ./text_gen "texts/texts-$i.txt" 500000 $i
+done
