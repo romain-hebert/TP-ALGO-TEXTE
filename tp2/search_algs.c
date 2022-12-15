@@ -227,3 +227,27 @@ int horspool(char const *x, int m, const char *y, int n, int alpha) {
     }
     return occ;
 }
+
+void dern_occ2(const char *x, int m, int alpha, int *dernocc2) {
+    int i;
+
+    for (i = 0; i < alpha; ++i)
+        dernocc2[i] = m + 1;
+    for (i = 0; i < m; ++i)
+        dernocc2[x[i] - ALPHA_START] = m - i;
+}
+
+int quick_search(const char *x, int m, const char *y, int n, int alpha) {
+    int occ = 0;
+
+    int dernocc2[alpha];
+    dern_occ2(x, m, alpha, dernocc2);
+
+    int j = 0;
+    while (j <= n - m) {
+        if (strncmp(y + j, x, (size_t) m) == 0)
+            occ += 1;
+        j += dernocc2[*(y + j + m) - ALPHA_START];
+    }
+    return occ;
+}

@@ -28,3 +28,5 @@ int knuth_mp(const char *x, int m, const char *y, int n);
 int boyer_moore(const char *x, int m, const char *y, int n, int alpha);
 
 int horspool(char const *x, int m, const char *y, int n, int alpha);
+
+int quick_search(const char *x, int m, const char *y, int n, int alpha);

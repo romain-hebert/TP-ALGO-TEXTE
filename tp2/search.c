@@ -4,17 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define USAGE "USAGE: ./search -[p] TEXT_FILE WORDS_FILE ALPHA_SIZE ALG_NO\n"
+#define ALG_NO                                                                 \
+    "ALG_NO:\n1. Naive quick loop\n2. Naive quick loop with"                   \
+    " sentinel\n3. Naive quick loop with strncmp\n"                            \
+    "4. Naive quick loop with strncmp and sentinel\n"                          \
+    "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"                                 \
+    "7. Boyer-Moore\n8. Horspool\n9. Quick search\n"
+#define PRINT "-p: Displays results on output, might make the program slower.\n"
+
 int main(int argc, char *argv[]) {
     if (argc < 5) {
-        fprintf(stderr, "USAGE: ./search -[p] TEXT_FILE WORDS_FILE ALPHA_SIZE "
-                        "ALG_NO\n");
-        fprintf(stderr, "ALG_NO:\n1. Naive quick loop\n2. Naive quick loop with"
-                        " sentinel\n3. Naive quick loop with strncmp\n"
-                        "4. Naive quick loop with strncmp and sentinel\n"
-                        "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"
-                        "7. Boyer-Moore\n8. Horspool\n"
-                        "-p: Displays results on output, might make the"
-                        "program slower.\n");
+        fprintf(stderr, USAGE ALG_NO PRINT);
         exit(EXIT_FAILURE);
     }
     int arg = 1;
@@ -44,11 +45,11 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    char *words[WORD_COUNT + 1];
-    int i = 0;
-    words[i++] = strtok(buf, " ");
-    while (i < WORD_COUNT) {
-        words[i++] = strtok(NULL, " \0");
+    char *words[WORD_COUNT];
+    char *saveptr;
+    words[0] = strtok_r(buf, " ", &saveptr);
+    for (size_t i = 1; i < WORD_COUNT; i++) {
+        words[i] = strtok_r(NULL, " \0\n", &saveptr);
     }
     fclose(x);
     int word_len = (int) strlen(words[0]);
@@ -112,15 +113,14 @@ int main(int argc, char *argv[]) {
             fprintf(out, "Occurences of %s: %d\n", words[i], res);
         }
         break;
+    case 9:
+        for (size_t i = 0; i < WORD_COUNT; i++) {
+            res = quick_search(words[i], word_len, text, TEXT_LEN, alpha_size);
+            fprintf(out, "Occurences of %s: %d\n", words[i], res);
+        }
+        break;
     default:
-        fprintf(stderr, "Wrong ALG_NO\n");
-        fprintf(stderr, "ALG_NO:\n1. Naive quick loop\n2. Naive quick loop with"
-                        " sentinel\n3. Naive quick loop with strncmp\n"
-                        "4. Naive quick loop with strncmp and sentinel\n"
-                        "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"
-                        "7. Boyer-Moore\n8. Horspool\n"
-                        "-p: Displays results on output, might make the"
-                        "program slower.\n");
+        fprintf(stderr, "Wrong ALG_NO\nALG_NO");
         break;
     }
     fclose(out);

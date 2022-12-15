@@ -1,4 +1,5 @@
 #!/bin/bash
+make
 word_len=(4 5 6 7 8 9 10 15 20 30 40 50)
 alpha=(2 4 20 70)
 echo "Generating..."
