@@ -1,103 +1,15 @@
+#include "search_algs.h"
 #include "constants.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define WORD_COUNT 100
-#define TEXT_LEN 500000
-
-void bon_pref(const char *x, int m, int *bon_pref);
-
-void meil_pref(const char *x, int m, int *meil_pref);
-
-void dern_occ(const char *x, int m, int alpha, int *dernocc);
-
-// Return nb of occurence of x, a word of size m, in y, a text of size n
-unsigned long naive_bi(const char *x, int m, const char *y, int n);
-
-unsigned long naive_bi_br(const char *x, int m, const char *y, int n);
-
-unsigned long naive_bi_br_sent(const char *x, int m, char *y, int n);
-
-unsigned long naive_strncmp(const char *x, int m, const char *y, int n);
-
-unsigned long naive_strncmp_br(const char *x, int m, const char *y, int n);
-
-unsigned long naive_strncmp_br_sent(const char *x, int m, char *y, int n);
-
-unsigned long morris_pratt(const char *x, int m, const char *y, int n);
-
-unsigned long knuth_mp(const char *x, int m, const char *y, int n);
-
-unsigned long boyer_moore(const char *x, int m, const char *y, int n,
-        int alpha);
-
-unsigned long horspool(char const *x, int m, const char *y, int n, int alpha);
-
-int main(void) {
-    // Cette fonction sert à tester les différents algorithmes
-    FILE *y = fopen("texts/text2.txt", "r");
-    if (y == NULL) {
-        perror("fopen()");
-        exit(EXIT_FAILURE);
-    }
-    FILE *x = fopen("words/word2.txt", "r");
-    if (x == NULL) {
-        perror("fopen()");
-        exit(EXIT_FAILURE);
-    }
-    int word_len = 12;
-
-    // Remplir le tableau words avec les mots du fichier x
-    char buf[BUF_SIZE] = {'\0'};
-    if (fread(buf, sizeof(char), BUF_SIZE, x) <= 0) {
-        perror("fread on x");
-        exit(EXIT_FAILURE);
-    }
-
-    char *words[WORD_COUNT + 1];
-    int i = 0;
-    words[i++] = strtok(buf, " ");
-    while (i < WORD_COUNT) {
-        words[i++] = strtok(NULL, " ");
-    }
-    fclose(x);
-
-    // Mettre le texte dans un char*
-    char text[TEXT_LEN + word_len + 1];
-    if (fread(text, sizeof(char), TEXT_LEN, y) <= 0) {
-        perror("fread on y");
-        exit(EXIT_FAILURE);
-    }
-    fclose(y);
-
-    printf("Search of %s\n", words[0]);
-    unsigned long mp = morris_pratt(words[0], word_len, text, TEXT_LEN);
-    unsigned long kmp = knuth_mp(words[0], word_len, text, TEXT_LEN);
-    // unsigned long nb = naive_bi(words[0], word_len, text, TEXT_LEN);
-    unsigned long nbb = naive_bi_br(words[0], word_len, text, TEXT_LEN);
-    // unsigned long ns = naive_strncmp(words[0], word_len, text, TEXT_LEN);
-    unsigned long nsb = naive_strncmp_br(words[0], word_len, text, TEXT_LEN);
-    unsigned long nbbs = naive_bi_br_sent(words[0], word_len, text, TEXT_LEN);
-    unsigned long nsbs =
-            naive_strncmp_br_sent(words[0], word_len, text, TEXT_LEN);
-    unsigned long bm = boyer_moore(words[0], word_len, text, TEXT_LEN, 2);
-    unsigned long hp = horspool(words[0], word_len, text, TEXT_LEN, 2);
-
-    // print au format cvs
-    printf("nbb,%zu\nnbbs,%zu\nnsb,%zu\nnsbs,%zu\nmp,%zu\nkmp,%zu\nbm,%"
-           "zu\nhp,%zu\n",
-            nbb, nbbs, nsb, nsbs, mp, kmp, bm, hp);
-    return EXIT_SUCCESS;
-}
-
 // ALGOS
-// unsigned long naive_bi(const char *x, unsigned long m, char *y, unsigned long
-// n) {}
+// int naive_bi(const char *x, int m, char *y, int n) {}
 
-unsigned long naive_bi_br(const char *x, int m, const char *y, int n) {
-    unsigned long occ = 0;
+int naive_bi_br(const char *x, int m, const char *y, int n) {
+    int occ = 0;
     int i;
     for (int j = 0; j <= n - m; j++) {
         for (i = 0; i < m && x[i] == y[i + j]; i++) {}
@@ -116,8 +28,8 @@ void remove_sent(char *text, int text_len) {
     text[text_len + 1] = '\0';
 }
 
-unsigned long naive_bi_br_sent(const char *x, int m, char *y, int n) {
-    unsigned long occ = 0;
+int naive_bi_br_sent(const char *x, int m, char *y, int n) {
+    int occ = 0;
     add_sent(x, m, y, n);
 
     int i, j = 0;
@@ -136,18 +48,18 @@ unsigned long naive_bi_br_sent(const char *x, int m, char *y, int n) {
     exit(EXIT_FAILURE);
 }
 
-// unsigned long naive_strncmp(const char *x, int m, char *y, int n) {}
+// int naive_strncmp(const char *x, int m, char *y, int n) {}
 
-unsigned long naive_strncmp_br(const char *x, int m, const char *y, int n) {
-    unsigned long occ = 0;
+int naive_strncmp_br(const char *x, int m, const char *y, int n) {
+    int occ = 0;
     for (int j = 0; j <= n - m; j++)
         if (strncmp(y + j, x, (size_t) m) == 0)
             occ += 1;
     return occ;
 }
 
-unsigned long naive_strncmp_br_sent(const char *x, int m, char *y, int n) {
-    unsigned long occ = 0;
+int naive_strncmp_br_sent(const char *x, int m, char *y, int n) {
+    int occ = 0;
     add_sent(x, m, y, n);
     int j = 0;
     while (1) {
@@ -191,13 +103,13 @@ void meil_pref(const char *x, int m, int *mp) {
     mp[m] = i;
 }
 
-unsigned long morris_pratt(const char *x, int m, const char *y, int n) {
+int morris_pratt(const char *x, int m, const char *y, int n) {
     int bp[m];
     for (int i = 0; i < m; i++)
         bp[i] = 0;
     bon_pref(x, m, bp);
 
-    unsigned long occ = 0;
+    int occ = 0;
     int i = 0;
     for (int j = 0; j < n - m; j++) {
         while (i >= 0 && x[i] != y[j])
@@ -211,13 +123,13 @@ unsigned long morris_pratt(const char *x, int m, const char *y, int n) {
     return occ;
 }
 
-unsigned long knuth_mp(const char *x, int m, const char *y, int n) {
+int knuth_mp(const char *x, int m, const char *y, int n) {
     int mp[m];
     for (int i = 0; i < m; i++)
         mp[i] = 0;
     meil_pref(x, m, mp);
 
-    unsigned long occ = 0;
+    int occ = 0;
     int i = 0;
     for (int j = 0; j < n - m; j++) {
         while (i >= 0 && x[i] != y[j])
@@ -276,9 +188,8 @@ void bon_suff(const char *x, int m, int *bonsuff) {
         bonsuff[m - 1 - s[i]] = m - 1 - i;
 }
 
-unsigned long boyer_moore(const char *x, int m, const char *y, int n,
-        int alpha) {
-    unsigned long occ = 0;
+int boyer_moore(const char *x, int m, const char *y, int n, int alpha) {
+    int occ = 0;
 
     int dernocc[alpha];
     dern_occ(x, m, alpha, dernocc);
@@ -301,8 +212,8 @@ unsigned long boyer_moore(const char *x, int m, const char *y, int n,
     return occ;
 }
 
-unsigned long horspool(char const *x, int m, const char *y, int n, int alpha) {
-    unsigned int occ = 0;
+int horspool(char const *x, int m, const char *y, int n, int alpha) {
+    int occ = 0;
 
     int dernocc[alpha];
     dern_occ(x, m, alpha, dernocc);

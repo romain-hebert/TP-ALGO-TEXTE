@@ -7,7 +7,8 @@
 	"settings": {
 		"files.associations": {
 			"limits.h": "c",
-			"string.h": "c"
+			"string.h": "c",
+			"constants.h": "c"
 		}
 	}
 }
