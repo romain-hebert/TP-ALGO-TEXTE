@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define USAGE "USAGE: ./search -[p] TEXT_FILE WORDS_FILE ALPHA_SIZE ALG_NO\n"
+#define USAGE "USAGE: ./search -[n] TEXT_FILE WORDS_FILE ALPHA_SIZE ALG_NO\n"
 #define ALG_NO                                                                 \
     "ALG_NO:\n1. Naive quick loop\n2. Naive quick loop with"                   \
     " sentinel\n3. Naive quick loop with strncmp\n"                            \
     "4. Naive quick loop with strncmp and sentinel\n"                          \
     "5. Morris-Pratt\n6. Knuth-Morris-Pratt\n"                                 \
     "7. Boyer-Moore\n8. Horspool\n9. Quick search\n"
-#define PRINT "-p: Displays results on output, might make the program slower.\n"
+#define PRINT "-n: Disables the output, makes the program faster\n"
 
 int main(int argc, char *argv[]) {
     if (argc < 5) {
@@ -20,11 +20,11 @@ int main(int argc, char *argv[]) {
     }
     int arg = 1;
     FILE *out;
-    if (strcmp("-p", argv[arg]) == 0) {
-        out = stdout;
+    if (strcmp("-n", argv[arg]) == 0) {
+        out = fopen("/dev/null", "w");
         arg++;
     } else {
-        out = fopen("/dev/null", "w");
+        out = stdout;
     }
 
     FILE *y = fopen(argv[arg++], "r");
@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
     char buf[BUF_SIZE] = {'\0'};
     if (fread(buf, sizeof(char), BUF_SIZE, x) <= 0) {
         perror("fread on x");
+        fclose(out);
         exit(EXIT_FAILURE);
     }
 
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
     char text[TEXT_LEN + word_len + 1];
     if (fread(text, sizeof(char), TEXT_LEN, y) <= 0) {
         perror("fread on y");
+        fclose(out);
         exit(EXIT_FAILURE);
     }
     fclose(y);
@@ -68,7 +70,6 @@ int main(int argc, char *argv[]) {
     case 1:
         for (size_t i = 0; i < WORD_COUNT; i++) {
             res = naive_bi_br(words[i], word_len, text, TEXT_LEN);
-            fprintf(out, "Occurences of %s: %d\n", words[i], res);
         }
         break;
     case 2:
@@ -120,8 +121,9 @@ int main(int argc, char *argv[]) {
         }
         break;
     default:
-        fprintf(stderr, "Wrong ALG_NO\nALG_NO");
-        break;
+        fprintf(stderr, "Wrong ALG_NO\n" ALG_NO);
+        fclose(out);
+        exit(EXIT_FAILURE);
     }
     fclose(out);
 

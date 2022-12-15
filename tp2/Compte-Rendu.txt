@@ -1,0 +1,18 @@
+Manuel rapide:
+    Executer la commande make dans ce répertoire
+    ./generators.sh pour génerer les fichier texts et les listes de mots.
+        Ce script utilise les programmes écrits dans text_gen.c et 
+        word_gen.c
+    ./search permet d'executer un algorithme au choix sur un fichier text
+        et un fichier de liste de mots. Executez ./search sans arguments
+        pour voir les arguments attendues.
+    ./benchmark pour calculer les vitesses d'execution des algorithmes
+        sur les fichier générés aléatoirement, les resultats sont stocké
+        dans le répertoire results/
+
+Compte rendu:
+    ./benchmark ne produit malheuresement pas le format exigé pour une
+    raison qui m'est inconnue. Mais en executant manuellement les
+    algorithmes sous la commande time, il est possible d'observer que
+    Boyer-Moore et horspool sont les algorithmes de recherche les plus rapide
+    en générale.

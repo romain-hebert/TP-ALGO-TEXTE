@@ -244,10 +244,10 @@ int quick_search(const char *x, int m, const char *y, int n, int alpha) {
     dern_occ2(x, m, alpha, dernocc2);
 
     int j = 0;
-    while (j <= n - m) {
+    while (j < n - m) {
         if (strncmp(y + j, x, (size_t) m) == 0)
             occ += 1;
-        j += dernocc2[*(y + j + m) - ALPHA_START];
+        j += dernocc2[y[j + m] - ALPHA_START];
     }
     return occ;
 }
