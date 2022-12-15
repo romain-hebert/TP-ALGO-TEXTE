@@ -12,7 +12,7 @@ rm -r results
 mkdir results
 echo "Benchmarking..."
 for i in {0..9}; do
-    touch results/${alg[$i]}.csv
+    touch results/${alg[$i+1]}.csv
     for j in ${alpha[@]}; do
         for k in ${word_len[@]}; do
             echo -n "${alpha[$j]},${word_len[$k]}," >> results/${alg[$i]}.csv

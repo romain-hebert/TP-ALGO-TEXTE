@@ -65,6 +65,12 @@ int main(int argc, char *argv[]) {
     fclose(y);
 
     int alpha_size = atoi(argv[arg++]);
+    if (alpha_size > MAX_ALPHA) {
+        fprintf(stderr, "Not enough readable characters for %d long alpahbet\n",
+                alpha_size);
+        fclose(out);
+        exit(EXIT_FAILURE);
+    }
     int res = 0;
     switch (atoi(argv[arg++])) {
     case 1:

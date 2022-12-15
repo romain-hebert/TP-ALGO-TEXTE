@@ -26,7 +26,7 @@ mdproper: clean
 
 tar: mdproper
 	mkdir -p $(ARCHIVE_NAME)$(TP)
-	cp *.c *.h *.sh makefile $(ARCHIVE_NAME)$(TP)/
+	cp *.c *.h *.sh makefile *.txt $(ARCHIVE_NAME)$(TP)/
 	tar zcf $(ARCHIVE_NAME)$(TP).tar.gz $(ARCHIVE_NAME)$(TP)/
 	$(RM) -r $(ARCHIVE_NAME)$(TP)/
 
