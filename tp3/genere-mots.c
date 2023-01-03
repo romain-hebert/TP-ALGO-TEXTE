@@ -7,8 +7,8 @@
 
 #define MAX_ALPHA 78
 
-void word_gen(
-    int word_nb, int min_word_size, int max_word_size, int alphabet_size);
+void word_gen(int word_nb, int min_word_size, int max_word_size,
+        int alphabet_size);
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
@@ -25,19 +25,19 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-void word_gen(
-    int word_nb, int min_word_size, int max_word_size, int alphabet_size) {
+void word_gen(int word_nb, int min_word_size, int max_word_size,
+        int alphabet_size) {
     if (alphabet_size >= MAX_ALPHA) {
         // On tombe à court de caractères ASCII lisibles.
         fprintf(stderr, "Alphabet trop grand!\n");
         exit(EXIT_FAILURE);
     }
-    srand((unsigned int) word_nb + (unsigned int) min_word_size +
-          (unsigned int) alphabet_size + (unsigned int) time(NULL));
+    srand((unsigned int) (word_nb + min_word_size + alphabet_size) +
+            (unsigned int) time(NULL));
 
     for (int i = 0; i < word_nb; i++) {
         int word_size =
-            min_word_size + (rand() % (max_word_size - min_word_size + 1));
+                min_word_size + (rand() % (max_word_size - min_word_size + 1));
         for (int k = 0; k < word_size; k++) {
             printf("%c", (char) (48 + (rand() % alphabet_size)));
         }
