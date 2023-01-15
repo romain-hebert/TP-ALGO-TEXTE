@@ -112,9 +112,9 @@ struct queue {
     int size;
 };
 
-void enqueue(struct queue *q, int data) {
+void enqueue(struct queue *q, int node) {
     struct _queue *newNode = (struct _queue *) malloc(sizeof(struct _queue));
-    newNode->node = data;
+    newNode->node = node;
     newNode->next = NULL;
     if (q->tail == NULL) {
         q->head = newNode;
@@ -131,12 +131,12 @@ int dequeue(struct queue *q) {
         printf("Queue is empty\n");
         return -1;
     }
-    int data = q->head->node;
+    int node = q->head->node;
     struct _queue *temp = q->head;
     q->head = q->head->next;
     free(temp);
     q->size--;
-    return data;
+    return node;
 }
 
 void completer(Trie trie) {
@@ -159,7 +159,7 @@ void completer(Trie trie) {
         }
 
         for (unsigned char i = 0; i < UCHAR_MAX; i++) {
-            /* code */
+            // …
         }
     }
     // …
